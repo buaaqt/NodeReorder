@@ -50,36 +50,6 @@ def load_cora(path="../data/cora/", dataset="cora"):
     idx_test = torch.LongTensor(idx_test)
 
     return edges, features, labels, idx_train, idx_val, idx_test
-# def load_cora(path="../data/cora/", dataset="cora"):
-#     """Load citation network dataset (cora only for now)"""
-#     print('Loading {} dataset...'.format(dataset))
-#
-#     idx_features_labels = np.genfromtxt("{}{}.content".format(path, dataset),
-#                                         dtype=np.dtype(str))
-#     features = sp.csr_matrix(idx_features_labels[:, 1:-1], dtype=np.float32)
-#     labels = encode_onehot(idx_features_labels[:, -1])
-#
-#     # build graph
-#     edges_unordered = np.genfromtxt("{}{}.cites".format(path, dataset), dtype=np.int32)
-#     neigh_tab = gen_neigh_tab(edges_unordered)
-#     node_cluster = node_clustering(neigh_tab, 0.05)
-#     node_order = np.array(reorder(node_cluster))
-#     idx_map = {j: i for i, j in enumerate(node_order)}
-#     edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),
-#                      dtype=np.int32).reshape(edges_unordered.shape)
-#
-#     idx_train = range(140)
-#     idx_val = range(200, 500)
-#     idx_test = range(500, 1500)
-#
-#     features = torch.FloatTensor(np.array(features.todense()))
-#
-#     labels = torch.LongTensor(np.where(labels)[1])
-#     idx_train = torch.LongTensor(idx_train)
-#     idx_val = torch.LongTensor(idx_val)
-#     idx_test = torch.LongTensor(idx_test)
-#
-#     return edges, features, labels, idx_train, idx_val, idx_test
 
 
 def accuracy(output, labels):
