@@ -58,6 +58,7 @@ def accuracy(output, labels):
     correct = correct.sum()
     return correct / len(labels)
 
+
 def gen_neigh_tab(edges: np.ndarray):
     [u, v] = np.split(edges.flatten('F'), 2)
     edges_pd = pd.DataFrame({
@@ -65,10 +66,6 @@ def gen_neigh_tab(edges: np.ndarray):
         'dst': v
     }, dtype=int)
 
-    # def get_val(x):
-    #     a = v[x['dst']]
-    #     print(a)
-    #     return v[x['dst']]
     src_group = edges_pd.groupby('src').apply(lambda x: v[x['dst']]).to_dict()
     dst_group = edges_pd.groupby('dst').apply(lambda x: u[x['src']]).to_dict()
     res = {}
