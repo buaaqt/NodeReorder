@@ -34,6 +34,7 @@ def load_cora(path="../data/cora/", dataset="cora"):
     edges = np.array(list(map(order_map.get, edges.flatten())),
                      dtype=np.int32).reshape(edges.shape)
 
+    neigh_tab = gen_neigh_tab(edges)
     idx_features_labels = idx_features_labels[node_order]
     features = sp.csr_matrix(idx_features_labels[:, 1:-1], dtype=np.float32)
     labels = encode_onehot(idx_features_labels[:, -1])
@@ -43,13 +44,12 @@ def load_cora(path="../data/cora/", dataset="cora"):
     idx_test = range(500, 1500)
 
     features = torch.FloatTensor(np.array(features.todense()))
-
     labels = torch.LongTensor(np.where(labels)[1])
     idx_train = torch.LongTensor(idx_train)
     idx_val = torch.LongTensor(idx_val)
     idx_test = torch.LongTensor(idx_test)
 
-    return edges, features, labels, idx_train, idx_val, idx_test
+    return neigh_tab, features, labels, idx_train, idx_val, idx_test
 
 
 def accuracy(output, labels):
@@ -58,24 +58,28 @@ def accuracy(output, labels):
     correct = correct.sum()
     return correct / len(labels)
 
-
 def gen_neigh_tab(edges: np.ndarray):
     [u, v] = np.split(edges.flatten('F'), 2)
     edges_pd = pd.DataFrame({
         'src': u,
         'dst': v
     }, dtype=int)
-    src_group = edges_pd.groupby('src').groups
-    dst_group = edges_pd.groupby('dst').groups
+
+    # def get_val(x):
+    #     a = v[x['dst']]
+    #     print(a)
+    #     return v[x['dst']]
+    src_group = edges_pd.groupby('src').apply(lambda x: v[x['dst']]).to_dict()
+    dst_group = edges_pd.groupby('dst').apply(lambda x: u[x['src']]).to_dict()
     res = {}
     keys = set(dst_group.keys()) | set(src_group.keys())
     for key in keys:
         if key not in src_group:
-            res[key] = set(dst_group[key].to_list())
+            res[key] = set(dst_group[key].tolist())
         elif key in dst_group:
-            res[key] = set(src_group[key].to_list()) | set(dst_group[key].tolist())
+            res[key] = set(src_group[key].tolist()) | set(dst_group[key].tolist())
         else:
-            res[key] = set(src_group[key].to_list())
+            res[key] = set(src_group[key].tolist())
     return res
 
 
