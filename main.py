@@ -3,6 +3,7 @@ import time
 import torch
 import torch.optim as optim
 import torch.nn.functional as F
+import numpy as np
 
 from utils import load_cora, accuracy
 from models import GCN
@@ -28,15 +29,25 @@ def train(epoch):
           'time: {:.4f}s'.format(time.time() - t))
 
 
+def test():
+    model.eval()
+    output = model(features, neigh_tab)
+    loss_test = F.nll_loss(output[idx_test], labels[idx_test])
+    acc_test = accuracy(output[idx_test], labels[idx_test])
+    print("Test set results:",
+          "loss= {:.4f}".format(loss_test.item()),
+          "accuracy= {:.4f}".format(acc_test.item()))
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', type=str, default='cora',
                         help='Select a graph dataset.')
-    parser.add_argument('--epochs', type=int, default=5,
+    parser.add_argument('--epochs', type=int, default=200,
                         help='Number of epochs to train.')
     parser.add_argument('--no-cuda', action='store_true', default=True,
                         help='Disables CUDA training.')
-    parser.add_argument('--lr', type=float, default=0.1,
+    parser.add_argument('--lr', type=float, default=0.005,
                         help='Initial learning rate.')
     parser.add_argument('--weight_decay', type=float, default=5e-4,
                         help='Weight decay (L2 loss on parameters).')
@@ -49,6 +60,12 @@ if __name__ == "__main__":
                         help='Random seed.')
     args = parser.parse_args()
     args.cuda = not args.no_cuda and torch.cuda.is_available()
+
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    if args.cuda:
+        print('Using Cuda with', torch.cuda.get_device_name(0))
+        torch.cuda.manual_seed(args.seed)
 
     # Load data
     neigh_tab, features, labels, idx_train, idx_val, idx_test = load_cora()
@@ -70,5 +87,11 @@ if __name__ == "__main__":
         idx_val = idx_val.cuda()
         idx_test = idx_test.cuda()
 
+    # Train model
+    t_total = time.time()
     for epoch in range(args.epochs):
         train(epoch)
+    print("Optimization Finished!")
+    print("Total time elapsed: {:.4f}s".format(time.time() - t_total))
+
+    test()

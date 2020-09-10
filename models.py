@@ -13,8 +13,8 @@ class GCN(nn.Module, ABC):
         self.gc2 = GraphConvolution(n_hid, n_class, 1)
         self.dropout = dropout
 
-    def forward(self, x, adj):
-        x = F.relu(self.gc1(x, adj))
+    def forward(self, x, neigh_tab):
+        x = F.relu(self.gc1(x, neigh_tab))
         x = F.dropout(x, self.dropout, training=self.training)
-        x = self.gc2(x, adj)
+        x = self.gc2(x, neigh_tab)
         return F.log_softmax(x, dim=1)

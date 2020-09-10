@@ -38,8 +38,13 @@ class GraphConvolution(Module, ABC):
         support = torch.mm(_input, self.weight)
         aggr_res = np.zeros(shape=support.shape)
         for node in neigh_tab:
-            neigh = neigh_tab[node]
-            #aggr_res[node] =
+            neigh = list(neigh_tab[node])
+            aggr_res[node] = support[neigh].detach().numpy().mean(0)
+        aggr_res = torch.FloatTensor(aggr_res)
+        if self.bias is not None:
+            return aggr_res + self.bias
+        else:
+            return aggr_res
 
     def __repr__(self):
         return '\n' \
