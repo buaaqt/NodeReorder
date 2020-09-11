@@ -36,10 +36,10 @@ class GraphConvolution(Module, ABC):
 
     def forward(self, _input, neigh_tab):
         support = torch.mm(_input, self.weight)
-        aggr_res = np.zeros(shape=support.shape)
+        aggr_res = torch.zeros(support.shape)
         for node in neigh_tab:
             neigh = list(neigh_tab[node])
-            aggr_res[node] = support[neigh].detach().numpy().mean(0)
+            aggr_res[node] = torch.mean(support[neigh], 0)
         aggr_res = torch.FloatTensor(aggr_res)
         if self.bias is not None:
             return aggr_res + self.bias

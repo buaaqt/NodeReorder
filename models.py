@@ -9,8 +9,8 @@ class GCN(nn.Module, ABC):
     def __init__(self, n_feat, n_hid, n_class, dropout):
         super(GCN, self).__init__()
 
-        self.gc1 = GraphConvolution(n_feat, n_hid, 0)
-        self.gc2 = GraphConvolution(n_hid, n_class, 1)
+        self.gc1 = GraphConvolution(n_feat, n_hid)
+        self.gc2 = GraphConvolution(n_hid, n_class)
         self.dropout = dropout
 
     def forward(self, x, neigh_tab):

@@ -19,6 +19,11 @@ def train(epoch):
     loss_train.backward()
     optimizer.step()
 
+    # Evaluate validation set performance separately,
+    # deactivates dropout during validation run.
+    model.eval()
+    output = model(features, neigh_tab)
+
     loss_val = F.nll_loss(output[idx_val], labels[idx_val])
     acc_val = accuracy(output[idx_val], labels[idx_val])
     print('Epoch: {:04d}'.format(epoch+1),
@@ -43,11 +48,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', type=str, default='cora',
                         help='Select a graph dataset.')
-    parser.add_argument('--epochs', type=int, default=200,
+    parser.add_argument('--epochs', type=int, default=100,
                         help='Number of epochs to train.')
     parser.add_argument('--no-cuda', action='store_true', default=True,
                         help='Disables CUDA training.')
-    parser.add_argument('--lr', type=float, default=0.005,
+    parser.add_argument('--lr', type=float, default=0.05,
                         help='Initial learning rate.')
     parser.add_argument('--weight_decay', type=float, default=5e-4,
                         help='Weight decay (L2 loss on parameters).')
@@ -81,7 +86,6 @@ if __name__ == "__main__":
     if args.cuda:
         model.cuda()
         features = features.cuda()
-        neigh_tab = neigh_tab.cuda()
         labels = labels.cuda()
         idx_train = idx_train.cuda()
         idx_val = idx_val.cuda()

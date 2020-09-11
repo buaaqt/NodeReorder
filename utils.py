@@ -29,14 +29,14 @@ def load_cora(path="../data/cora/", dataset="cora"):
     np.savetxt('edges.txt', edges, fmt='%d')
 
     neigh_tab = gen_neigh_tab(edges)
-    # node_cluster = node_clustering(neigh_tab, 0.05)
-    # node_order = np.array(reorder(node_cluster))
-    # order_map = {j: i for i, j in enumerate(node_order)}
-    # edges = np.array(list(map(order_map.get, edges.flatten())),
-    #                  dtype=np.int32).reshape(edges.shape)
-    #
-    # neigh_tab = gen_neigh_tab(edges)
-    # idx_features_labels = idx_features_labels[node_order]
+    node_cluster = node_clustering(neigh_tab, 0.05)
+    node_order = np.array(reorder(node_cluster))
+    order_map = {j: i for i, j in enumerate(node_order)}
+    edges = np.array(list(map(order_map.get, edges.flatten())),
+                     dtype=np.int32).reshape(edges.shape)
+
+    neigh_tab = gen_neigh_tab(edges)
+    idx_features_labels = idx_features_labels[node_order]
     features = sp.csr_matrix(idx_features_labels[:, 1:-1], dtype=np.float32)
     labels = encode_onehot(idx_features_labels[:, -1])
 
