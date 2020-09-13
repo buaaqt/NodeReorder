@@ -26,7 +26,6 @@ def load_cora(path="./data/cora/", dataset="cora"):
     edges_unordered = np.genfromtxt("{}{}.cites".format(path, dataset), dtype=np.int32)
     edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),
                      dtype=np.int32).reshape(edges_unordered.shape)
-    np.savetxt('edges.txt', edges, fmt='%d')
 
     neigh_tab = gen_neigh_tab(edges)
     node_cluster = node_clustering(neigh_tab, 0.05)
