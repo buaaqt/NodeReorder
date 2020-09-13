@@ -15,7 +15,7 @@ def encode_onehot(labels):
     return labels_onehot
 
 
-def load_cora(path="../data/cora/", dataset="cora"):
+def load_cora(path="./data/cora/", dataset="cora"):
     """Load citation network dataset (cora only for now)"""
     print('Loading {} dataset...'.format(dataset))
     idx_features_labels = np.genfromtxt("{}{}.content".format(path, dataset),
@@ -78,7 +78,7 @@ def gen_neigh_tab(edges: np.ndarray):
             res[key] = set(src_group[key].tolist()) | set(dst_group[key].tolist())
         else:
             res[key] = set(src_group[key].tolist())
-        res[key].add(key)
+        # res[key].add(key)
     return res
 
 
